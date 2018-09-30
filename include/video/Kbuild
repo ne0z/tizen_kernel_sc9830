@@ -1,0 +1,14 @@
+header-y += ion_sprd.h
+header-y += sprd_vsp.h
+header-y += sprd_jpg.h
+header-y += gsp_types_shark.h
+header-y += gspn_user_cfg.h
+header-y += sprd_img.h
+header-y += sprd_isp.h
+header-y += sprd_rotation.h
+header-y += sprd_rot_k.h
+header-y += sprd_scale.h
+header-y += sprd_scale_k.h
+header-y += sprd_dma_copy_k.h
+header-y += sensor_drv_k.h
+header-y += isp_drv_kernel.h

@@ -1,0 +1,34 @@
+/* Copyright (c) 2013-2014, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/ {
+	sprd_drm: sprd,sprd_drm@20800000 {
+		compatible = "sprd,sprd_drm";
+		reg = <0xf5122000 0x1000>;
+		reg-names = "sprdfb";
+		interrupts = <0 46 0>;
+		interrupt-names = "sprd_drm_irq";
+	};
+
+	sprd_drm_ipp: sprd,sprd_drm_ipp {
+		compatible = "sprd,sprd_drm_ipp";
+	};
+
+	sprd_drm_gsp: sprd,sprd_drm_gsp@20a00000 {
+		compatible = "sprd,sprd_drm_gsp";
+		reg = <0x20a00000 0x1000>;
+		reg-names = "sprdgsp";
+		interrupts = <0 51 0>;
+		interrupt-names = "sprd_drm_gsp_irq";
+		gsp_mmu_ctrl_base = <0x21408000>;
+	};
+};

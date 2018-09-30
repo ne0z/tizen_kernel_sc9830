@@ -1,0 +1,34 @@
+config DRM_SPRD
+	tristate "DRM Support for Spreadtrum SoC SPRD Series"
+	depends on DRM
+	select FB_CFB_FILLRECT
+	select FB_CFB_COPYAREA
+	select FB_CFB_IMAGEBLIT
+	select VT_HW_CONSOLE_BINDING if FRAMEBUFFER_CONSOLE
+	help
+	  Choose this option if you have a Spreadtrum SoC SPRD chipset.
+	  If M is selected the module will be called sprddrm.
+
+config DRM_SPRD_DMABUF
+	bool "SPRD DRM DMABUF"
+	depends on DRM_SPRD
+	help
+	  Choose this option if you want to use DMABUF feature for DRM.
+
+config DRM_SPRD_IPP
+	bool "SPRD DRM IPP"
+	depends on DRM_SPRD
+	help
+	  Choose this option if you want to use IPP feature for DRM.
+
+config DRM_SPRD_GSP
+	bool "SPRD DRM GSP"
+	depends on DRM_SPRD_IPP
+	help
+	  Choose this option if you want to use SPRD GSP for DRM.
+
+config DRM_DPMS_IOCTL
+	bool "DRM DPMS IOCTL"
+	depends on DRM_SPRD
+	help
+	  Choose this option if you want to use drm dpms ioctl.

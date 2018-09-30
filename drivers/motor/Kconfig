@@ -1,0 +1,6 @@
+config FF_DC_VIBRATOR
+	tristate "FF_DC_VIBRATOR"
+	default n
+	help
+	 Say Y to enable ff dc vibrator
+

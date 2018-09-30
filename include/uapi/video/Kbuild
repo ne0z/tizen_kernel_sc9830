@@ -1,0 +1,5 @@
+# UAPI Header export list
+header-y += edid.h
+header-y += sisfb.h
+header-y += sprdfb.h
+header-y += uvesafb.h
