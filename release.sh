@@ -15,7 +15,7 @@ REGION=${3}
 OPERATOR=${4}
 TIZEN_MODEL=tizen_${MODEL}
 
-export CROSS_COMPILE="/opt/toolchains/tizen2.4_cross_toolchain_for_32bit_host/bin/armv7l-tizen-linux-gnueabi-"
+export CROSS_COMPILE="/opt/tizen_toolchain/bin/arm-linux-gnueabi-"
 
 
 if [ "${MODEL}" = "" ]; then
