@@ -361,13 +361,9 @@ static int ext4_valid_extent(struct inode *inode, struct ext4_extent *ext)
 	ext4_fsblk_t block = ext4_ext_pblock(ext);
 	int len = ext4_ext_get_actual_len(ext);
 	ext4_lblk_t lblock = le32_to_cpu(ext->ee_block);
+	ext4_lblk_t last = lblock + len - 1;
 
-	/*
-	 * We allow neither:
-	 *  - zero length
-	 *  - overflow/wrap-around
-	 */
-	if (lblock + len <= lblock)
+	if (len == 0 || lblock > last)
 		return 0;
 	return ext4_data_block_valid(EXT4_SB(inode->i_sb), block, len);
 }
@@ -426,48 +422,6 @@ static int ext4_valid_extent_entries(struct inode *inode,
 	return 1;
 }
 
-/* for debugging if ext4_extent is not valid */
-static void
-ext4_ext_show_eh(struct inode *inode, struct ext4_extent_header *eh)
-{
-	int i;
-
-	if (eh == NULL)
-		return;
-	printk(KERN_ERR "eh_magic : 0x%x eh_entries : %u "
-			"eh_max : %u eh_depth : %u \n",
-			le16_to_cpu(eh->eh_magic), le16_to_cpu(eh->eh_entries),
-			le16_to_cpu(eh->eh_max) ,le16_to_cpu(eh->eh_depth));
-
-	if (le16_to_cpu(eh->eh_depth) == 0) {
-		/* leaf entries */
-		struct ext4_extent *ex = EXT_FIRST_EXTENT(eh);
-
-		printk(KERN_ERR "Displaying leaf extents for inode %lu\n",
-				inode->i_ino);
-
-		for (i = 0; i < 4; i++, ex++) {
-			printk(KERN_ERR "leaf - block : %d / length : [%d]%d /"
-				" pblock : %llu\n",le32_to_cpu(ex->ee_block),
-				ext4_ext_is_uninitialized(ex),
-				ext4_ext_get_actual_len(ex),
-				ext4_ext_pblock(ex));
-		}
-	}
-	else {
-		struct ext4_extent_idx *ei = EXT_FIRST_INDEX(eh);
-
-		printk(KERN_ERR "Displaying index extents for inode %lu\n",
-				inode->i_ino);
-
-		for (i = 0; i < 4; i++, ei++) {
-			printk(KERN_ERR "idx - block : %d / pblock : %llu\n",
-					le32_to_cpu(ei->ei_block),
-					ext4_idx_pblock(ei));
-		}
-	}
-}
-
 static int __ext4_ext_check(const char *function, unsigned int line,
 			    struct inode *inode, struct ext4_extent_header *eh,
 			    int depth)
@@ -500,10 +454,6 @@ static int __ext4_ext_check(const char *function, unsigned int line,
 		error_msg = "invalid extent entries";
 		goto corrupted;
 	}
-	if (unlikely(depth > 32)) {
-		error_msg = "too large eh_depth";
-		goto corrupted;
-	}
 	/* Verify checksum on non-root extent tree nodes */
 	if (ext_depth(inode) != depth &&
 	    !ext4_extent_block_csum_verify(inode, eh)) {
@@ -513,9 +463,6 @@ static int __ext4_ext_check(const char *function, unsigned int line,
 	return 0;
 
 corrupted:
-	printk(KERN_ERR "Print invalid extent entries\n");
-	ext4_ext_show_eh(inode, eh);
-
 	ext4_error_inode(inode, function, line, 0,
 			"bad header/extent: %s - magic %x, "
 			"entries %u, max %u(%u), depth %u(%u)",

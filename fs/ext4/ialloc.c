@@ -315,12 +315,8 @@ out:
 		err = ext4_handle_dirty_metadata(handle, NULL, bitmap_bh);
 		if (!fatal)
 			fatal = err;
-	} else {
-		/* for debugging, sangwoo2.lee */
-		print_bh(sb, bitmap_bh, 0, EXT4_BLOCK_SIZE(sb));
-		/* for debugging */
+	} else
 		ext4_error(sb, "bit already cleared for inode %lu", ino);
-	}
 
 error_return:
 	brelse(bitmap_bh);
@@ -1031,13 +1027,11 @@ struct inode *ext4_orphan_get(struct super_block *sb, unsigned long ino)
 		goto iget_failed;
 
 	/*
-	 * If the orphans has i_nlinks > 0 then it should be able to
-	 * be truncated, otherwise it won't be removed from the orphan
-	 * list during processing and an infinite loop will result.
-	 * Similarly, it must not be a bad inode.
+	 * If the orphans has i_nlinks > 0 then it should be able to be
+	 * truncated, otherwise it won't be removed from the orphan list
+	 * during processing and an infinite loop will result.
 	 */
-	if ((inode->i_nlink && !ext4_can_truncate(inode)) ||
-	    is_bad_inode(inode))
+	if (inode->i_nlink && !ext4_can_truncate(inode))
 		goto bad_orphan;
 
 	if (NEXT_ORPHAN(inode) > max_ino)
