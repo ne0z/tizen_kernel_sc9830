@@ -417,6 +417,9 @@ int radeon_info_ioctl(struct drm_device *dev, void *data, struct drm_file *filp)
 	case RADEON_INFO_SI_CP_DMA_COMPUTE:
 		*value = 1;
 		break;
+	case RADEON_INFO_SI_CP_DMA_COMPUTE:
+		*value = 1;
+		break;
 	default:
 		DRM_DEBUG_KMS("Invalid request %d\n", info->request);
 		return -EINVAL;

@@ -1182,6 +1182,8 @@ static int parse_dirfile(char *buf, size_t nbytes, struct file *file,
 			       file->f_pos, dirent->ino, dirent->type);
 		if (over)
 			break;
+		if (memchr(dirent->name, '/', dirent->namelen) != NULL)
+			return -EIO;
 
 		buf += reclen;
 		nbytes -= reclen;
@@ -1732,6 +1734,7 @@ static int fuse_setxattr(struct dentry *entry, const char *name,
 {
 	struct inode *inode = entry->d_inode;
 	struct fuse_conn *fc = get_fuse_conn(inode);
+	struct fuse_inode *fi = get_fuse_inode(inode);
 	struct fuse_req *req;
 	struct fuse_setxattr_in inarg;
 	int err;

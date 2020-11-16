@@ -1037,6 +1037,34 @@ static void i915_error_wake_up(struct drm_i915_private *dev_priv,
 		wake_up_all(&dev_priv->gpu_error.reset_queue);
 }
 
+static void i915_error_wake_up(struct drm_i915_private *dev_priv,
+			       bool reset_completed)
+{
+	struct intel_ring_buffer *ring;
+	int i;
+
+	/*
+	 * Notify all waiters for GPU completion events that reset state has
+	 * been changed, and that they need to restart their wait after
+	 * checking for potential errors (and bail out to drop locks if there is
+	 * a gpu reset pending so that i915_error_work_func can acquire them).
+	 */
+
+	/* Wake up __wait_seqno, potentially holding dev->struct_mutex. */
+	for_each_ring(ring, dev_priv, i)
+		wake_up_all(&ring->irq_queue);
+
+	/* Wake up intel_crtc_wait_for_pending_flips, holding crtc->mutex. */
+	wake_up_all(&dev_priv->pending_flip_queue);
+
+	/*
+	 * Signal tasks blocked in i915_gem_wait_for_error that the pending
+	 * reset state is cleared.
+	 */
+	if (reset_completed)
+		wake_up_all(&dev_priv->gpu_error.reset_queue);
+}
+
 /**
  * i915_error_work_func - do process context error handling work
  * @work: work struct
