@@ -546,6 +546,33 @@ static int acpi_pci_root_add(struct acpi_device *device,
 	if (no_aspm)
 		pcie_no_aspm();
 
+	/*
+	 * TBD: Need PCI interface for enumeration/configuration of roots.
+	 */
+
+	/*
+	 * Scan the Root Bridge
+	 * --------------------
+	 * Must do this prior to any attempt to bind the root device, as the
+	 * PCI namespace does not get created until this call is made (and
+	 * thus the root bridge's pci_dev does not exist).
+	 */
+	root->bus = pci_acpi_scan_root(root);
+	if (!root->bus) {
+		dev_err(&device->dev,
+			"Bus %04x:%02x not present in PCI namespace\n",
+			root->segment, (unsigned int)root->secondary.start);
+		result = -ENODEV;
+		goto end;
+	}
+
+	if (clear_aspm) {
+		dev_info(&device->dev, "Disabling ASPM (FADT indicates it is unsupported)\n");
+		pcie_clear_aspm(root->bus);
+	}
+	if (no_aspm)
+		pcie_no_aspm();
+
 	pci_acpi_add_bus_pm_notifier(device, root->bus);
 	if (device->wakeup.flags.run_wake)
 		device_set_run_wake(root->bus->bridge, true);
